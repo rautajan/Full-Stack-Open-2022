@@ -11,6 +11,8 @@ const Finder = (props) => {
   );
 };
 
+
+
 const App = () => {
   const [character, setNewCharacater] = useState("");
   const [allData, setAllData] = useState([]);
@@ -28,34 +30,45 @@ const App = () => {
     //console.log("Maat listassa", countries)
   };
 
-  // const drawOneCountry = () => {
-  //   console.log("yksi maa", countries);
-  //   return (
-  //     <div>
-  //       <h1>{countries[0].name.common}</h1>
-  //       <p>capital {countries[0].capital}</p>
-  //       <p>area {countries[0].area}</p>
-  //       <h3>languages:</h3>
-  //       <ul>
-  //         {countries.map((country) => {
-  //           //console.log((Object.values(country.languages)).map(value => value))
-  //           return Object.values(country.languages).map((value) => (
-  //             <li>{value}</li>
-  //           ));
-  //         })}
-  //       </ul>
-  //       <img style={{ width: 150, height: 150 }} src={countries[0].flags.png} />
-  //     </div>
-  //   );
-  // };
+  const drawOneCountry = () => {
+    return (
+      <div>
+        <h1>{countries[0].name.common}</h1>
+        <p>capital {countries[0].capital}</p>
+        <p>area {countries[0].area}</p>
+        <h3>languages:</h3>
+        <ul>
+          {countries.map((country) => {
+            //console.log((Object.values(country.languages)).map(value => value))
+            return Object.values(country.languages).map((value) => (
+              <li key={value}>{value}</li>
+            ));
+          })}
+        </ul>
+        <img style={{ width: 150, height: 150 }} src={countries[0].flags.png} />
+      </div>
+    );
+  };
 
-  const Drawer = () => {
+
+  const drawClickedCountry = (country) => {
+    console.log("maa:", country)
+    setCountries(countries.filter(c=> country.name.common===c.name.common)) //uudelleen renderöinti koska tila muuttuu => draweria kutsutaan uudestaan
+
+  };
+
+  const drawer = () => {
     const countryNames =
       countries.length === 0
         ? null
         : countries.map((country) => {
-           // console.log("1-10 maata", countries);
-            return <p key={country.name.common}>{country.name.common}</p>;
+            // console.log("1-10 maata", countries);
+            return (
+              <p key={country.name.common}>
+                {country.name.common}{" "}
+                <button onClick={() => drawClickedCountry(country)}>show</button>
+              </p>
+            );
           });
     if (countries.length > 10) {
       //console.log("yli kymmenen", countries);
@@ -63,33 +76,21 @@ const App = () => {
     }
     if (countries.length === 1) {
       //console.log("yksi maa", countries);
-      //drawOneCountry;
-      return (
-        <div>
-          <h1>{countries[0].name.common}</h1>
-          <p>capital {countries[0].capital}</p>
-          <p>area {countries[0].area}</p>
-          <h3>languages:</h3>
-          <ul>
-            {countries.map((country) => {
-              //console.log((Object.values(country.languages)).map(value => value))
-              return Object.values(country.languages).map((value) => (
-                <li key={value}>{value}</li>
-              ));
-            })}
-          </ul>
-          <img
-            style={{ width: 150, height: 150 }}
-            src={countries[0].flags.png}
-          />
-        </div>
-      );
+      return drawOneCountry();
     }
-    //console.log("countryNames", countryNames, "countries:", countries);
     return countryNames;
   };
+  
 
 
+  // const Button = () => {
+  //   return (
+  //     <div style={{ display: "flex" }}>
+  //       <Drawer />
+  //       <button>show</button>
+  //     </div>
+  //   );
+  // };
 
   useEffect(() => {
     axios.get("https://restcountries.com/v3.1/all").then((response) => {
@@ -97,13 +98,12 @@ const App = () => {
     });
   }, []);
 
-
   return (
     <div>
       <Finder character={character} onChange={handleCharacterChange} />
       {/* {countries.length !==0 ? countries.map (country => <p>{country.name.common}</p>) : []} */}
-      <Drawer />
-      {/* {countryNames} */}
+      {drawer()}
+      {/* <button onClick={() => console.log("click") drawOneCountry()}> show</button> */}
     </div>
   );
 };
