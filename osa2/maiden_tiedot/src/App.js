@@ -11,8 +11,6 @@ const Finder = (props) => {
   );
 };
 
-
-
 const App = () => {
   const [character, setNewCharacater] = useState("");
   const [allData, setAllData] = useState([]);
@@ -50,11 +48,11 @@ const App = () => {
     );
   };
 
-
   const drawClickedCountry = (country) => {
-    console.log("maa:", country)
-    setCountries(countries.filter(c=> country.name.common===c.name.common)) //uudelleen renderöinti koska tila muuttuu => draweria kutsutaan uudestaan
-
+    //console.log("maa:", country);
+    setCountries(
+      countries.filter((c) => country.name.common === c.name.common)
+    ); //uudelleen renderöinti koska tila muuttuu => draweria kutsutaan uudestaan
   };
 
   const drawer = () => {
@@ -66,7 +64,9 @@ const App = () => {
             return (
               <p key={country.name.common}>
                 {country.name.common}{" "}
-                <button onClick={() => drawClickedCountry(country)}>show</button>
+                <button onClick={() => drawClickedCountry(country)}>
+                  show
+                </button>
               </p>
             );
           });
@@ -80,8 +80,16 @@ const App = () => {
     }
     return countryNames;
   };
-  
 
+  const weather = () => {
+    if (countries.length === 1) {
+      return (
+        <div>
+          <h2>Weather in </h2>
+        </div>
+      );
+    }
+  };
 
   // const Button = () => {
   //   return (
@@ -98,14 +106,22 @@ const App = () => {
     });
   }, []);
 
+  // useEffect{() => {
+  //   axios.get("")
+  // }}
+
   return (
     <div>
       <Finder character={character} onChange={handleCharacterChange} />
       {/* {countries.length !==0 ? countries.map (country => <p>{country.name.common}</p>) : []} */}
       {drawer()}
+      {weather()}
+
       {/* <button onClick={() => console.log("click") drawOneCountry()}> show</button> */}
     </div>
   );
 };
+
+//LAITA .ENV tiedosto git ignoreen
 
 export default App;
