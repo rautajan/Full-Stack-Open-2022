@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { isVisible } from "@testing-library/user-event/dist/utils";
+
+const api_key = process.env.REACT_APP_API_KEY;
 
 const Finder = (props) => {
   return (
@@ -15,6 +16,10 @@ const App = () => {
   const [character, setNewCharacater] = useState("");
   const [allData, setAllData] = useState([]);
   const [countries, setCountries] = useState([]);
+  const [capital, setCapital] = useState("Helsinki");
+  const [prevCapital, setPrevCapital] = useState(null);
+  const [weatherData, setWeatherData] = useState(null);
+ 
 
   const handleCharacterChange = (event) => {
     setNewCharacater(event.target.value);
@@ -29,6 +34,10 @@ const App = () => {
   };
 
   const drawOneCountry = () => {
+    if (prevCapital !== countries[0].capital) {
+      setPrevCapital(countries[0].capital);
+      setCapital(countries[0].capital);
+    }
     return (
       <div>
         <h1>{countries[0].name.common}</h1>
@@ -49,7 +58,6 @@ const App = () => {
   };
 
   const drawClickedCountry = (country) => {
-    //console.log("maa:", country);
     setCountries(
       countries.filter((c) => country.name.common === c.name.common)
     ); //uudelleen renderöinti koska tila muuttuu => draweria kutsutaan uudestaan
@@ -60,7 +68,6 @@ const App = () => {
       countries.length === 0
         ? null
         : countries.map((country) => {
-            // console.log("1-10 maata", countries);
             return (
               <p key={country.name.common}>
                 {country.name.common}{" "}
@@ -71,11 +78,9 @@ const App = () => {
             );
           });
     if (countries.length > 10) {
-      //console.log("yli kymmenen", countries);
       return <p>Too many matches, specify another filter</p>;
     }
     if (countries.length === 1) {
-      //console.log("yksi maa", countries);
       return drawOneCountry();
     }
     return countryNames;
@@ -85,20 +90,20 @@ const App = () => {
     if (countries.length === 1) {
       return (
         <div>
-          <h2>Weather in </h2>
+          <h2>Weather in {capital}</h2>
+          <p>
+            temperature {(weatherData.main.temp - 273.15).toFixed(2)} Celsius
+          </p>
+          <img
+            src={`http://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`}
+            alt="saaikoni"
+          />
+
+          <p>Wind {weatherData.wind.speed} m/s</p>
         </div>
       );
     }
   };
-
-  // const Button = () => {
-  //   return (
-  //     <div style={{ display: "flex" }}>
-  //       <Drawer />
-  //       <button>show</button>
-  //     </div>
-  //   );
-  // };
 
   useEffect(() => {
     axios.get("https://restcountries.com/v3.1/all").then((response) => {
@@ -106,9 +111,16 @@ const App = () => {
     });
   }, []);
 
-  // useEffect{() => {
-  //   axios.get("")
-  // }}
+  useEffect(() => {
+    axios
+      .get(
+        `https://api.openweathermap.org/data/2.5/weather?q=${capital}&appid=${api_key}`
+      )
+      .then((response) => {
+        setCapital(response.data.name);
+        setWeatherData(response.data);
+      });
+  }, [capital]);
 
   return (
     <div>
