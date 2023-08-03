@@ -5,15 +5,11 @@ import Total from "./Total";
 const Course = (props) => {
   return (
     <div>
-      <Header course={props.course.name} />
-      <Content parts= {props.course.parts}/>
-      <Total parts={props.course.parts}/>
+      <Header course={props.singleCourse} />
+      <Content parts={props.singleCourse.parts} />
+      <Total parts={props.singleCourse.parts} />
     </div>
   );
 };
 
-
-
-
-
-export default Course
+export default Course;

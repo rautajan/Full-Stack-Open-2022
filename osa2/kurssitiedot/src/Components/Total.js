@@ -1,16 +1,13 @@
-const Total = ({parts}) => {
+const Total = ({ parts }) => {
+  const total = parts.reduce((sum, part) => {
+    return sum + part.exercises;
+  }, 0);
 
-    const total = parts.reduce((sum, part) => {
-        return sum+part.exercises
-    }, 0)
-    console.log("total", total);
-    
+  return (
+    <div>
+      <b>total of exercises {total}</b>
+    </div>
+  );
+};
 
-    return(
-        <div>
-           <b>total of exercises {total}</b>
-        </div>
-    )
-}
-
-export default Total
+export default Total;

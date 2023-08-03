@@ -1,9 +1,9 @@
-const Header = ({course}) => {
-    return (
-      <>
-        <h1>{course}</h1>
-      </>
-    );
-  };
+const Header = ({ course }) => {
+  return (
+    <>
+      <h3>{course.name}</h3>
+    </>
+  );
+};
 
-  export default Header
+export default Header;
