@@ -1,5 +1,7 @@
 import { useState } from "react";
-
+import Filter from "./Components/Filter";
+import PersonForm from "./Components/PersonForm";
+import Persons from "./Components/Persons";
 const App = () => {
   const [persons, setPersons] = useState([
     { name: "Arto Hellas", number: "040-123456" },
@@ -55,7 +57,6 @@ const App = () => {
   const handleNumberChange = (event) => {
     setNewNumber(event.target.value);
   };
-
   const handleFilterChange = (event) => {
     setNewFilter(event.target.value);
   };
@@ -63,28 +64,21 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <form>
-        <div>
-          filter shown with
-          <input value={newFilter} onChange={handleFilterChange}></input>
-        </div>
-      </form>
+      <Filter
+        newFilter={newFilter}
+        handleFilterChange={handleFilterChange}
+        persons={persons}
+      />
       <h2>add a new</h2>
-      <form onSubmit={addName}>
-        <div>
-          {" "}
-          name: <input value={newName} onChange={handleNameChange} />
-        </div>
-        <div>
-          {" "}
-          number: <input value={newNumber} onChange={handleNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm
+        addName={addName}
+        newNumber={newNumber}
+        newName={newName}
+        handleNameChange={handleNameChange}
+        handleNumberChange={handleNumberChange}
+      />
       <h2>Numbers</h2>
-      {showPersons()}
+      <Persons showPersons={showPersons} />
     </div>
   );
 };
