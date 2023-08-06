@@ -47,7 +47,13 @@ const App = () => {
     const nameInList = () => persons.some((person) => person.name === newName);
     if (!nameInList()) {
       const newPerson = { name: newName, number: newNumber };
-      setPersons([...persons, newPerson]);
+      axios
+        .post("http://localhost:3001/persons", newPerson)
+        .then(response => {
+          console.log(response)
+          setPersons([...persons, newPerson]);
+        })
+      
       setNewName("");
       setNewNumber("");
     } else {
