@@ -2,18 +2,13 @@ import { useState, useEffect } from "react";
 import Filter from "./Components/Filter";
 import PersonForm from "./Components/PersonForm";
 import Persons from "./Components/Persons";
-import axios from "axios";
+import personService from "./services/persons";
 const App = () => {
   useEffect(() => {
-    axios
-    .get("http://localhost:3001/persons")
-    .then(response => {
-      const personsFromJsonServer = response.data
-      setPersons(personsFromJsonServer)
-    })
-  }, [])
-
-  
+    personService.getAll().then((personsFromJsonServer) => {
+      setPersons(personsFromJsonServer);
+    });
+  }, []);
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
@@ -25,6 +20,7 @@ const App = () => {
         <div key={index}>
           <>
             {person.name} {person.number}
+            <button onClick={() => handleDeleteClick(person)}>delete</button>
           </>
         </div>
       ));
@@ -42,22 +38,43 @@ const App = () => {
       ));
     }
   };
+  const handleDeleteClick = (person) => {
+    /* eslint-disable no-restricted-globals */
+    if (confirm(`Delete ${person.name} ?`)) {
+      personService
+        .deletePerson(person.id)
+        .then(() => {
+          return personService.getAll();
+        })
+        .then((personsFromJsonServer) => {
+          setPersons(personsFromJsonServer);
+        });
+    }
+    /* eslint-enable no-restricted-globals */
+  };
+
   const addName = (event) => {
     event.preventDefault();
     const nameInList = () => persons.some((person) => person.name === newName);
     if (!nameInList()) {
       const newPerson = { name: newName, number: newNumber };
-      axios
-        .post("http://localhost:3001/persons", newPerson)
-        .then(response => {
-          console.log(response)
-          setPersons([...persons, newPerson]);
-        })
-      
-      setNewName("");
-      setNewNumber("");
+      personService.create(newPerson).then((returnedPerson) => {
+        setPersons(persons.concat(returnedPerson));
+        setNewName("");
+        setNewNumber("");
+      });
     } else {
-      alert(`${newName} is already added to phonebook`);
+      /* eslint-disable no-restricted-globals */
+      if (confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)){
+        const personUpdateId= (persons.find(person => person.name === newName)).id
+        const updatedPerson = {name: newName, number: newNumber, id: personUpdateId}
+        personService.update(personUpdateId, updatedPerson)
+        .then(response => {
+          setPersons(persons.map(person => person.id === personUpdateId ? response : person))
+        })
+
+      }
+      /* eslint-enable no-restricted-globals */
       setNewName("");
       setNewNumber("");
     }
