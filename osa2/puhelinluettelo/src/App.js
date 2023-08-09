@@ -3,6 +3,7 @@ import Filter from "./Components/Filter";
 import PersonForm from "./Components/PersonForm";
 import Persons from "./Components/Persons";
 import personService from "./services/persons";
+import Notification from "./Components/Notification";
 const App = () => {
   useEffect(() => {
     personService.getAll().then((personsFromJsonServer) => {
@@ -13,6 +14,11 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [newFilter, setNewFilter] = useState("");
+  const [addMessage, setNewAddMessage] = useState(null);
+  const [removeMessage, setRemoveMessage] = useState(null);
+  const [updateMessage, setUpdateMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  console.log("Add message rendering", addMessage);
 
   const showPersons = () => {
     if (newFilter === "") {
@@ -39,18 +45,26 @@ const App = () => {
     }
   };
   const handleDeleteClick = (person) => {
-    /* eslint-disable no-restricted-globals */
-    if (confirm(`Delete ${person.name} ?`)) {
+    if (window.confirm(`Delete ${person.name} ?`)) {
       personService
         .deletePerson(person.id)
         .then(() => {
-          return personService.getAll();
+          setPersons(persons.filter((p) => p.id !== person.id));
+          setRemoveMessage(`${person.name} deleted`);
+          setTimeout(() => {
+            setRemoveMessage(null);
+          }, 5000);
         })
-        .then((personsFromJsonServer) => {
-          setPersons(personsFromJsonServer);
+        .catch((error) => {
+          console.log(error);
+          setErrorMessage(
+            `Information of ${person.name} has already been removed from server`
+          );
+          setTimeout(() => {
+            setErrorMessage(null);
+          }, 5000);
         });
     }
-    /* eslint-enable no-restricted-globals */
   };
 
   const addName = (event) => {
@@ -60,21 +74,40 @@ const App = () => {
       const newPerson = { name: newName, number: newNumber };
       personService.create(newPerson).then((returnedPerson) => {
         setPersons(persons.concat(returnedPerson));
+        setNewAddMessage(`Added ${newName}`);
+        console.log("ADDMESSAGE", addMessage);
+        setTimeout(() => {
+          setNewAddMessage(null);
+        }, 5000);
         setNewName("");
         setNewNumber("");
       });
     } else {
-      /* eslint-disable no-restricted-globals */
-      if (confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)){
-        const personUpdateId= (persons.find(person => person.name === newName)).id
-        const updatedPerson = {name: newName, number: newNumber, id: personUpdateId}
-        personService.update(personUpdateId, updatedPerson)
-        .then(response => {
-          setPersons(persons.map(person => person.id === personUpdateId ? response : person))
-        })
-
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        const personUpdateId = persons.find(
+          (person) => person.name === newName
+        ).id;
+        const updatedPerson = {
+          name: newName,
+          number: newNumber,
+          id: personUpdateId,
+        };
+        personService.update(personUpdateId, updatedPerson).then((response) => {
+          setPersons(
+            persons.map((person) =>
+              person.id === personUpdateId ? response : person
+            )
+          );
+          setUpdateMessage(`${newName}'s number updated`);
+          setTimeout(() => {
+            setUpdateMessage(null);
+          }, 5000);
+        });
       }
-      /* eslint-enable no-restricted-globals */
       setNewName("");
       setNewNumber("");
     }
@@ -93,6 +126,12 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification
+        addMessage={addMessage}
+        removeMessage={removeMessage}
+        updateMessage={updateMessage}
+        errorMessage={errorMessage}
+      />
       <Filter
         newFilter={newFilter}
         handleFilterChange={handleFilterChange}
