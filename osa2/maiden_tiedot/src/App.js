@@ -29,13 +29,17 @@ const App = () => {
     setCountries(filteredCountries);
   };
 
+  const handleShowButton = (country) => {
+    setCountries([country])
+  }
+
   return (
     <div>
       <CountryFilter
         newFilter={newFilter}
         handleFilterChange={handleFilterChange}
       />
-      <ShowCountry countries={countries} />
+      <ShowCountry countries={countries} handleShowButton={handleShowButton}/>
     </div>
   );
 };
