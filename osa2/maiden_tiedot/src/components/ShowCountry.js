@@ -6,10 +6,12 @@ const ShowCountry = ({ countries, handleShowButton }) => {
   } else if (countries.length === 1) {
     const country = countries[0];
     const languages = Object.values(country.languages);
+    const latitude = country.latlng[0];
+    const longitude = country.latlng[1];
 
     return (
       <div>
-        <h2>{country.name.common}</h2>
+        <h1>{country.name.common}</h1>
         capital {country.capital}
         <br />
         area {country.area}
@@ -31,8 +33,9 @@ const ShowCountry = ({ countries, handleShowButton }) => {
   return (
     <div>
       {countries.map((country, index) => (
-        <div key={index}>{country.name.common}
-        <button onClick={()=>handleShowButton(country)}>show</button>
+        <div key={index}>
+          {country.name.common}
+          <button onClick={() => handleShowButton(country)}>show</button>
         </div>
       ))}
     </div>
